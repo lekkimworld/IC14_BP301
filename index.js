@@ -12,6 +12,7 @@ var RELOAD_DELAY_SECONDS = 10;
 var secret = require("./secret");
 var twitter = require("./twitter");
 var mthing = require("./mthing");
+var cnx = require("./connections");
 
 /** 
  * Does twitter search.
@@ -33,6 +34,9 @@ var doSearch = function() {
 		setTimeout(doSearch, (RELOAD_DELAY_SECONDS || 10) * 1000);
 	});
 }
-doSearch();
+//doSearch();
+//mthing.setColor("color.txt", "#ff0000");
 
-mthing.setColor("color.txt", "#ff0000");
+var as = new cnx.AS("connections.connect2014.com", {
+	
+});
