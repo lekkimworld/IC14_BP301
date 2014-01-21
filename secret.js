@@ -19,9 +19,16 @@ var base64 = function(input) {
 /**
  * Get credentials for Twitter API.
  */
-var credentials = function() {
-	return base64(encodeURIComponent(CONSUMER_KEY) + ":" + encodeURIComponent(CONSUMER_SECRET));
+var doCredentials = function(username, password) {
+	return base64(username + ":" + password);
+}
+var twitterCredentials = function() {
+	return doCredentials(encodeURIComponent(CONSUMER_KEY), encodeURIComponent(CONSUMER_SECRET));
+}
+var cnxCredentials = function() {
+	return doCredentials("915741", "554224");
 }
 
 // export
-exports.credentials = credentials;
+exports.twitterCredentials = twitterCredentials;
+exports.cnxCredentials = cnxCredentials;

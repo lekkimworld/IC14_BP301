@@ -18,7 +18,7 @@ var cnx = require("./connections");
  * Does twitter search.
  */
 var doSearch = function() {
-	twitter.search("#ibmconnect", secret.credentials, function(result) {
+	twitter.search("#ibmconnect", secret.twitterCredentials, function(result) {
 		console.log(result.statuses.length + " results");
 		
 		for (var i=0; i<result.statuses.length; i++) {
@@ -37,6 +37,7 @@ var doSearch = function() {
 //doSearch();
 //mthing.setColor("color.txt", "#ff0000");
 
-var as = new cnx.AS("connections.connect2014.com", {
-	
+var as = new cnx.AS("connections.connect2014.com", secret.cnxCredentials);
+as.read(function(data) {
+	process.stdout.write(JSON.stringify(data));
 });
