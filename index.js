@@ -35,9 +35,21 @@ var doSearch = function() {
 	});
 }
 //doSearch();
-//mthing.setColor("color.txt", "#ff0000");
 
 var as = new cnx.AS("connections.connect2014.com", secret.cnxCredentials);
-as.read(function(data) {
-	process.stdout.write(JSON.stringify(data));
-});
+/*
+as.get(function(data) {
+	process.stdout.write(JSON.stringify(data.list));
+}, {groupid: "@actions"});
+*/
+var entry = new cnx.Entry()
+	.I()
+	.posted()
+	.on(new Date())
+	.object({
+		"objectType": "note",
+		"displayName": "Sales meeting", 
+		"summary": "Sales meeting w/ senior staff", 
+		"id": new Date().getTime() + ""
+	});
+as.post(entry, function() {});
