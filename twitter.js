@@ -6,23 +6,36 @@ http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 ***** */
 
 // declarations
+var TWITTER_CONSUMER_KEY = process.env.IC14_BP301_CONSUMER_KEY;
+var TWITTER_CONSUMER_SECRET = process.env.IC14_BP301_CONSUMER_SECRET;
 var HOSTNAME = "api.twitter.com";
-var token = null;
-var sinceId = null;
+var TOKEN = null;
+var SINCE_ID = null;
 
 // requires
+var secret = require("./secret");
 var https = require("https");
+
+/**
+ * Credentials encoding for Twitter OAuth2.
+ */
+var getCredentials = function() {
+	var creds = "Basic " + secret.credentials(TWITTER_CONSUMER_KEY, 
+		TWITTER_CONSUMER_SECRET, 
+		true);
+	return creds;
+}
 
 /**
  * Utility function to obtain a bearer token.
  */
-var getBearerToken = function(credentials, callback) {
+var getBearerToken = function(callback) {
 	var optToken = {
 		"host": HOSTNAME,
 		"path": "/oauth2/token",
 		"method": "POST",
 		"headers": {
-			"Authorization": "Basic " + credentials(),
+			"Authorization": getCredentials(),
 			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
 			"Content-Length": 29
 		}
@@ -30,7 +43,7 @@ var getBearerToken = function(credentials, callback) {
 	var req = https.request(optToken, function(res) {
 		res.on("data", function(d) {
 			var j = JSON.parse(d);
-			token = j.access_token;
+			TOKEN = j.access_token;
 			callback();
 		});
 	});
@@ -41,18 +54,18 @@ var getBearerToken = function(credentials, callback) {
 /**
  * Do twitter search.
  */
-var search = function(query, credentials, callback) {
-	if (!token) {
+var search = function(query, callback) {
+	if (!TOKEN) {
 		// no bearer token - go get it
 		process.stdout.write("No bearer token for Twitter found - requesting it\n");
-		getBearerToken(credentials, function() {
-			search(query, credentials, callback);
+		getBearerToken(function() {
+			search(query, callback);
 		});
 	} else {
 		// do search - compose arguments
-		process.stdout.write("Searching for <" + query + "> since <" + sinceId + ">\n");
+		process.stdout.write("Searching for <" + query + "> since <" + SINCE_ID + ">\n");
 		var urlArgs = "q=" + encodeURIComponent(query);
-		if (sinceId) urlArgs += "&since_id=" + sinceId;
+		if (SINCE_ID) urlArgs += "&since_id=" + SINCE_ID;
 		
 		// compose options
 		var options = {
@@ -60,7 +73,7 @@ var search = function(query, credentials, callback) {
 			"path": "/1.1/search/tweets.json?" + urlArgs,
 			"method": "GET", 
 			"headers": {
-				"Authorization": "Bearer " + token
+				"Authorization": "Bearer " + TOKEN
 			}
 		};
 		

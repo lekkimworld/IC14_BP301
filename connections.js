@@ -5,15 +5,26 @@ Creative Commons Attribution-ShareAlike 4.0 International License.
 http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 ***** */
 
+// declarations
+var IC14_USERNAME = process.env.IC14_USERNAME;
+var IC14_PASSWORD = process.env.IC14_PASSWORD;
+
 // require
+var secret = require("./secret");
 var https = require("https");
 
-var AS = function(hostname, credentials) {
+var AS = function(hostname) {
+	this._getCredentials = function() {
+		var creds = "Basic " + secret.credentials(IC14_USERNAME, 
+			IC14_PASSWORD);
+		return creds;
+	}
 	this.get = function(callback, options) {
 		// make sure there is a callback
 		if (!callback) {
 			throw new Error("Must have a callback - otherwise what's the point!?");
 		}
+		var that = this;
 		
 		// get data
 		var userid = this._getOption(options, "userid", "@me");
@@ -32,7 +43,7 @@ var AS = function(hostname, credentials) {
 			"path": path,
 			"method": "GET",
 			"headers": {
-				"Authorization": "Basic " + credentials()
+				"Authorization": "Basic " + that._getCredentials()
 			}
 		}
 		var req = https.request(reqOptions, function(res) {
@@ -48,6 +59,9 @@ var AS = function(hostname, credentials) {
 		req.end();
 	},
 	this.post = function(entry, callback) {
+		// keep ref
+		var that = this;
+		
 		// compose path
 		var path = "/connections/opensocial/basic/rest/activitystreams/@me/@all";
 		
@@ -62,7 +76,7 @@ var AS = function(hostname, credentials) {
 			"headers": {
 				"Content-Type": "application/json", 
 				"Content-Length": postData.length,
-				"Authorization": "Basic " + credentials()
+				"Authorization": "Basic " + that._getCredentials()
 			}
 		}
 		var req = https.request(reqOptions, function(res) {

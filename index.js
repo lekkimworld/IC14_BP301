@@ -9,16 +9,14 @@ http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 var RELOAD_DELAY_SECONDS = 10;
 
 // requires
-var secret = require("./secret");
 var twitter = require("./twitter");
-var mthing = require("./mthing");
 var cnx = require("./connections");
 
 /** 
  * Does twitter search.
  */
 var doSearch = function() {
-	twitter.search("#ibmconnect", secret.twitterCredentials, function(result) {
+	twitter.search("#ibmconnect", function(result) {
 		console.log(result.statuses.length + " results");
 		
 		for (var i=0; i<result.statuses.length; i++) {
@@ -34,14 +32,15 @@ var doSearch = function() {
 		setTimeout(doSearch, (RELOAD_DELAY_SECONDS || 10) * 1000);
 	});
 }
-//doSearch();
+doSearch();
 
-var as = new cnx.AS("connections.connect2014.com", secret.cnxCredentials);
+var as = new cnx.AS("connections.connect2014.com");
 /*
 as.get(function(data) {
 	process.stdout.write(JSON.stringify(data.list));
 }, {groupid: "@actions"});
 */
+/*
 var entry = new cnx.Entry()
 	.I()
 	.posted()
@@ -53,3 +52,4 @@ var entry = new cnx.Entry()
 		"id": new Date().getTime() + ""
 	});
 as.post(entry, function() {});
+*/
