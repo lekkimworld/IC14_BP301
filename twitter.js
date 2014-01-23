@@ -121,7 +121,11 @@ var Status = function(obj) {
 		return this.obj.user.profile_image_url;
 	}
 	this.getSenderProfileURL = function() {
-		return this.obj.user.entities.url.urls[0].expanded_url;
+		try {
+			return this.obj.user.entities.url.urls[0].expanded_url;
+		} catch (e) {
+			return null;
+		}
 	}
 	this.getMentions = function() {
 		var mentions = this.obj.entities.user_mentions;

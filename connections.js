@@ -138,11 +138,7 @@ var Entry = function() {
 	this.object = function(obj) {
 		this.result.object = obj;
 		return this;
-	},
-	this.generator = function(obj) {
-		this.result.generator = obj;
-		return this;
-	},
+	}
 	this.finalize = function() {
 		return this.result;
 	}

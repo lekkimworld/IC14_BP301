@@ -26,7 +26,7 @@ var doSearch = function() {
 		// loop
 		for (var i=0; i<result.statuses.length; i++) {
 			var status = new twitter.Status(result.statuses[i]);
-			if (status.getSender() == "lekkim" || status.hasMention("matnewman")) {
+			if (status.getSender() == "lekkim" || status.hasMention("lekkim")) {
 				// found tweet mentioning username
 				process.stdout.write("Found match - posting to AS\n");
 				
@@ -35,10 +35,15 @@ var doSearch = function() {
 				var displayName = "Tweet mentioning himself...";
 				var content = "Tweet from " + status.getSender() + ": " + status.getText();
 				var url = status.getURL();
-				var summary = "<table border=\"0\"><tr><td width=\"65\" valign=\"top\"><a href=\"" + status.getSenderProfileURL() + "\">\
-<img src=\"" + status.getSenderImageURL() + "\"></a></td>\
-<td valign=\"top\">@" + status.getSender() + ": <i>" + status.getText() + "</i>\
-</td></tr></table>";
+				var summary = "<table border=\"0\"><tr><td width=\"65\" valign=\"top\">";
+				if (null != status.getSenderProfileURL()) {
+					summary += "<a href=\"" + status.getSenderProfileURL() + "\">";
+				}
+				summary += "<img src=\"" + status.getSenderImageURL() + "\">";
+				if (null != status.getSenderProfileURL()) {
+					summary += "</a>";
+				}
+				summary += "</td><td valign=\"top\">@" + status.getSender() + ": <i>" + status.getText() + "</i></td></tr></table>";
 				
 				// create entry
 				var entry = new cnx.Entry()
@@ -52,13 +57,7 @@ var doSearch = function() {
 						"summary": summary,
 						"id": objectId,
 						"url": url
-					})/*
-					.generator({
-						"id": "bp301", 
-						"displayName": "BP301 at IBM Connect 2014",
-						"url": "https://github.com/lekkimworld/IC14_BP301",
-						"image": "https://twitter.com/favicon.ico"
-					})*/
+					})
 					.finalize();
 					
 				// post it
