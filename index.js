@@ -32,7 +32,7 @@ var doSearch = function() {
 		setTimeout(doSearch, (RELOAD_DELAY_SECONDS || 10) * 1000);
 	});
 }
-doSearch();
+//doSearch();
 
 var as = new cnx.AS("connections.connect2014.com");
 /*
@@ -40,7 +40,7 @@ as.get(function(data) {
 	process.stdout.write(JSON.stringify(data.list));
 }, {groupid: "@actions"});
 */
-/*
+
 var entry = new cnx.Entry()
 	.I()
 	.posted()
@@ -50,6 +50,9 @@ var entry = new cnx.Entry()
 		"displayName": "Sales meeting", 
 		"summary": "Sales meeting w/ senior staff", 
 		"id": new Date().getTime() + ""
+	})
+	.connections({
+		"saved": true
 	});
 as.post(entry, function() {});
-*/
+

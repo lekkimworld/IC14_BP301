@@ -119,12 +119,19 @@ var Entry = function() {
 		this.title = "${share}";
 		return this;
 	},
+	this.content = function(str) {
+		this.content = str;
+	},
 	this.on = function(date) {
 		this.updated = date.toISOString();
 		return this;
 	},
 	this.object = function(obj) {
 		this.object = obj;
+		return this;
+	},
+	this.connections = function(obj) {
+		this.connections = obj;
 		return this;
 	}
 }
