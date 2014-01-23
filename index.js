@@ -7,6 +7,7 @@ http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 
 // constants
 var RELOAD_DELAY_SECONDS = 15;
+var LOOKFOR_USERNAME = "lekkim";
 
 // requires
 var twitter = require("./twitter");
@@ -26,7 +27,7 @@ var doSearch = function() {
 		// loop
 		for (var i=0; i<result.statuses.length; i++) {
 			var status = new twitter.Status(result.statuses[i]);
-			if (status.getSender() == "lekkim" || status.hasMention("lekkim")) {
+			if (status.getSender() == LOOKFOR_USERNAME || status.hasMention(LOOKFOR_USERNAME)) {
 				// found tweet mentioning username
 				process.stdout.write("Found match - posting to AS\n");
 				
@@ -61,7 +62,14 @@ var doSearch = function() {
 					.finalize();
 					
 				// post it
-				as.post(entry, {"streamid": "@me"}, function() {});
+				as.post(entry, {"streamid": "@me"}, function(result) {
+					if (status.hasMention(LOOKFOR_USERNAME) && result) {
+						var entryId = result.entry.id;
+						as.save(entryId, true, function(result) {
+							process.stdout.write(JSON.stringify(result) + "\n");
+						});
+					}
+				});
 			}
 		}
 		

@@ -99,6 +99,49 @@ var AS = function(hostname) {
  		req.write(postData);
 		req.end();
 	},
+	this.save = function(id, flag, callback) {
+		// keep ref
+		var that = this;
+		
+		// compose path
+		var path = "/connections/opensocial/basic/rest/activitystreams/@me/@all/@all/" + id;
+		
+		// stringify PUT data
+		var putData = JSON.stringify({"actor": {"id": "@me"},
+			"id": id,
+			"connections": {
+				"saved":  flag
+			}
+		});
+		
+		// create options for request and do it
+		var reqOptions = {
+			"host": hostname,
+			"path": path,
+			"method": "PUT",
+			"headers": {
+				"Content-Type": "application/json", 
+				"Content-Length": putData.length,
+				"Authorization": that._getCredentials()
+			}
+		}
+		var req = https.request(reqOptions, function(res) {
+			var result = "";
+			res.on("data", function(data) {
+				result += data;
+			});
+			res.on("end", function() {
+				try {
+					var j = JSON.parse(result);
+					callback(j);
+				} catch (e) {
+					process.stdout.write("ERROR <" + e + ">\n");
+				}
+			});
+		});
+ 		req.write(putData);
+		req.end();
+	},
 	this._getOption = function(options, key, defaultValue) {
 		return (options && options[key]) ? options[key] : defaultValue;
 	}
