@@ -43,7 +43,7 @@ var AS = function(hostname) {
 			"path": path,
 			"method": "GET",
 			"headers": {
-				"Authorization": "Basic " + that._getCredentials()
+				"Authorization": that._getCredentials()
 			}
 		}
 		var req = https.request(reqOptions, function(res) {
@@ -58,12 +58,15 @@ var AS = function(hostname) {
 		});
 		req.end();
 	},
-	this.post = function(entry, callback) {
+	this.post = function(entry, options, callback) {
 		// keep ref
 		var that = this;
 		
+		// get stream
+		var streamid = this._getOption(options, "streamid", "@me");
+		
 		// compose path
-		var path = "/connections/opensocial/basic/rest/activitystreams/@me/@all";
+		var path = "/connections/opensocial/basic/rest/activitystreams/" + streamid + "/@all";
 		
 		// stringify POST data
 		var postData = JSON.stringify(entry);
@@ -76,7 +79,7 @@ var AS = function(hostname) {
 			"headers": {
 				"Content-Type": "application/json", 
 				"Content-Length": postData.length,
-				"Authorization": "Basic " + that._getCredentials()
+				"Authorization": that._getCredentials()
 			}
 		}
 		var req = https.request(reqOptions, function(res) {
@@ -85,8 +88,12 @@ var AS = function(hostname) {
 				result += data;
 			});
 			res.on("end", function() {
-				var j = JSON.parse(result);
-				callback(j);
+				try {
+					var j = JSON.parse(result);
+					callback(j);
+				} catch (e) {
+					process.stdout.write("ERROR <" + e + ">\n");
+				}
 			});
 		});
  		req.write(postData);
@@ -97,42 +104,47 @@ var AS = function(hostname) {
 	}
 }
 var Entry = function() {
+	this.result = {};
 	this.I = function() {
-		this.actor = {id: "@me"};
+		this.result.actor = {id: "@me"};
 		return this;
 	},
 	this.userId = function() {
 		
 	},
 	this.posted = function() {
-		this.verb = "post";
-		this.title = "${post}";
+		this.result.verb = "post";
+		this.result.title = "${post}";
 		return this;
 	},
 	this.created = function() {
-		this.verb = "create";
-		this.title = "${create}";
+		this.result.verb = "create";
+		this.result.title = "${create}";
 		return this;
 	},
 	this.shared = function() {
-		this.verb = "share";
-		this.title = "${share}";
+		this.result.verb = "share";
+		this.result.title = "${share}";
 		return this;
 	},
 	this.content = function(str) {
-		this.content = str;
+		this.result.content = str;
+		return this;
 	},
 	this.on = function(date) {
-		this.updated = date.toISOString();
+		this.result.updated = date.toISOString();
 		return this;
 	},
 	this.object = function(obj) {
-		this.object = obj;
+		this.result.object = obj;
 		return this;
 	},
-	this.connections = function(obj) {
-		this.connections = obj;
+	this.generator = function(obj) {
+		this.result.generator = obj;
 		return this;
+	},
+	this.finalize = function() {
+		return this.result;
 	}
 }
 

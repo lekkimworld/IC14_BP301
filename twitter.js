@@ -64,7 +64,7 @@ var search = function(query, callback) {
 	} else {
 		// do search - compose arguments
 		process.stdout.write("Searching for <" + query + "> since <" + SINCE_ID + ">\n");
-		var urlArgs = "q=" + encodeURIComponent(query);
+		var urlArgs = "q=" + encodeURIComponent(query) + "&count=100";
 		if (SINCE_ID) urlArgs += "&since_id=" + SINCE_ID;
 		
 		// compose options
@@ -90,9 +90,9 @@ var search = function(query, callback) {
 				
 				// store since
 				if (j.search_metadata.since_id) {
-					sinceId = j.search_metadata.since_id;
+					SINCE_ID = j.search_metadata.since_id;
 				} else {
-					sinceId = j.search_metadata.max_id + 1;
+					SINCE_ID = j.search_metadata.max_id + 1;
 				}
 				
 				// callback
@@ -108,12 +108,27 @@ var Status = function(obj) {
 	this.getText = function() {
 		return this.obj.text;
 	}
+	this.getID = function() {
+		return this.obj.id;
+	}
+	this.getURL = function() {
+		return "https://twitter.com/" + this.getSender() + "/status/" + this.obj.id_str;
+	}
+	this.getSender = function() {
+		return this.obj.user.screen_name;
+	}
+	this.getSenderImageURL = function() {
+		return this.obj.user.profile_image_url;
+	}
+	this.getSenderProfileURL = function() {
+		return this.obj.user.entities.url.urls[0].expanded_url;
+	}
 	this.getMentions = function() {
 		var mentions = this.obj.entities.user_mentions;
 		var result = [];
 		for (var k=0; k<mentions.length; k++) {
 			var mention = mentions[k];
-			if (!result.indexOf(mention.screen_name) != -1) result.push(mention.screen_name);
+			if (!result.indexOf(mention.screen_name.toLowerCase()) != -1) result.push(mention.screen_name.toLowerCase());
 		}
 		return result;
 	}

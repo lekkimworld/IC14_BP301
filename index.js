@@ -6,7 +6,7 @@ http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 ***** */
 
 // constants
-var RELOAD_DELAY_SECONDS = 10;
+var RELOAD_DELAY_SECONDS = 15;
 
 // requires
 var twitter = require("./twitter");
@@ -16,43 +16,59 @@ var cnx = require("./connections");
  * Does twitter search.
  */
 var doSearch = function() {
+	// create activity stream
+	var as = new cnx.AS("connections.connect2014.com");
+	
+	// do twitter search
 	twitter.search("#ibmconnect", function(result) {
-		console.log(result.statuses.length + " results");
+		process.stdout.write("Twitter search resulted in <" + result.statuses.length + "> results\n");
 		
+		// loop
 		for (var i=0; i<result.statuses.length; i++) {
 			var status = new twitter.Status(result.statuses[i]);
-			if (status.hasMention()) {
-				process.stdout.write(status.getText());
-				process.stdout.write("\n");
-				process.stdout.write("Found mentions <" + status.getMentions() + ">\n");
+			if (status.getSender() == "lekkim" || status.hasMention("matnewman")) {
+				// found tweet mentioning username
+				process.stdout.write("Found match - posting to AS\n");
+				
+				// compose strings
+				var objectId = status.getID();
+				var displayName = "Tweet mentioning himself...";
+				var content = "Tweet from " + status.getSender() + ": " + status.getText();
+				var url = status.getURL();
+				var summary = "<table border=\"0\"><tr><td width=\"65\" valign=\"top\"><a href=\"" + status.getSenderProfileURL() + "\">\
+<img src=\"" + status.getSenderImageURL() + "\"></a></td>\
+<td valign=\"top\">@" + status.getSender() + ": <i>" + status.getText() + "</i>\
+</td></tr></table>";
+				
+				// create entry
+				var entry = new cnx.Entry()
+					.I()
+					.shared()
+					.on(new Date())
+					.content(content)
+					.object({
+						"objectType": "tweet",
+						"displayName": displayName, 
+						"summary": summary,
+						"id": objectId,
+						"url": url
+					})/*
+					.generator({
+						"id": "bp301", 
+						"displayName": "BP301 at IBM Connect 2014",
+						"url": "https://github.com/lekkimworld/IC14_BP301",
+						"image": "https://twitter.com/favicon.ico"
+					})*/
+					.finalize();
+					
+				// post it
+				as.post(entry, {"streamid": "@me"}, function() {});
 			}
 		}
 		
 		// reschedule
-		setTimeout(doSearch, (RELOAD_DELAY_SECONDS || 10) * 1000);
+		setTimeout(doSearch, (RELOAD_DELAY_SECONDS || 15) * 1000);
 	});
 }
-//doSearch();
-
-var as = new cnx.AS("connections.connect2014.com");
-/*
-as.get(function(data) {
-	process.stdout.write(JSON.stringify(data.list));
-}, {groupid: "@actions"});
-*/
-
-var entry = new cnx.Entry()
-	.I()
-	.posted()
-	.on(new Date())
-	.object({
-		"objectType": "note",
-		"displayName": "Sales meeting", 
-		"summary": "Sales meeting w/ senior staff", 
-		"id": new Date().getTime() + ""
-	})
-	.connections({
-		"saved": true
-	});
-as.post(entry, function() {});
+doSearch();
 
