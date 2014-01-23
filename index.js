@@ -22,14 +22,29 @@ var doSearch = function() {
 	
 	// do twitter search
 	twitter.search("#ibmconnect", function(result) {
-		process.stdout.write("Twitter search resulted in <" + result.statuses.length + "> results\n");
+		process.stdout.write("\tTwitter search resulted in <" + result.statuses.length + "> result(s).\n");
+		
+		// function to determine include
+		var saveStatus = function(status) {
+			if (status.hasMention(LOOKFOR_USERNAME)) return true;
+			if (status.hasMention("ontimesuite")) return true;
+			if (status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
+			if (status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
+			return false;
+		}
+		// function to determine include
+		var includeStatus = function(status) {
+			if (status.getSender() == LOOKFOR_USERNAME) return true;
+			if (saveStatus(status)) return true;
+			return false;
+		}
 		
 		// loop
 		for (var i=0; i<result.statuses.length; i++) {
 			var status = new twitter.Status(result.statuses[i]);
-			if (status.getSender() == LOOKFOR_USERNAME || status.hasMention(LOOKFOR_USERNAME)) {
+			if (includeStatus(status)) {
 				// found tweet mentioning username
-				process.stdout.write("Found match - posting to AS\n");
+				process.stdout.write("Found match - posting to activity stream.\n");
 				
 				// compose strings
 				var objectId = status.getID();
@@ -44,7 +59,9 @@ var doSearch = function() {
 				if (null != status.getSenderProfileURL()) {
 					summary += "</a>";
 				}
-				summary += "</td><td valign=\"top\">@" + status.getSender() + ": <i>" + status.getText() + "</i></td></tr></table>";
+				summary += "</td><td valign=\"top\">@" + 
+					status.getSender() + ": <i>" + 
+					status.getText() + "</i></td></tr></table>";
 				
 				// create entry
 				var entry = new cnx.Entry()
@@ -63,10 +80,14 @@ var doSearch = function() {
 					
 				// post it
 				as.post(entry, {"streamid": "@me"}, function(result) {
-					if (status.hasMention(LOOKFOR_USERNAME) && result) {
+					process.stdout.write("\tPosted to activity stream.\n");
+					
+					// see if we should save it
+					if (result && saveStatus(status)) {
+						process.stdout.write("Activity Stream entry should be saved.\n");
 						var entryId = result.entry.id;
 						as.save(entryId, true, function(result) {
-							process.stdout.write(JSON.stringify(result) + "\n");
+							process.stdout.write("\tSaved activity stream entry.\n");
 						});
 					}
 				});

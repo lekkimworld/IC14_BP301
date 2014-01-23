@@ -20,12 +20,6 @@ var AS = function(hostname) {
 		return creds;
 	}
 	this.get = function(callback, options) {
-		// make sure there is a callback
-		if (!callback) {
-			throw new Error("Must have a callback - otherwise what's the point!?");
-		}
-		var that = this;
-		
 		// get data
 		var userid = this._getOption(options, "userid", "@me");
 		var groupid = this._getOption(options, "groupid", "@all");
@@ -37,94 +31,54 @@ var AS = function(hostname) {
 			groupid + "/" + 
 			appid;
 		
-		// create options for request and do it
-		var reqOptions = {
-			"host": hostname,
-			"path": path,
-			"method": "GET",
-			"headers": {
-				"Authorization": that._getCredentials()
-			}
-		}
-		var req = https.request(reqOptions, function(res) {
-			var result = "";
-			res.on("data", function(data) {
-				result += data;
-			});
-			res.on("end", function() {
-				var j = JSON.parse(result);
-				callback(j);
-			});
-		});
-		req.end();
+		// GET it
+		this._doRequest("GET", path, null, callback);
 	},
 	this.post = function(entry, options, callback) {
-		// keep ref
-		var that = this;
-		
 		// get stream
 		var streamid = this._getOption(options, "streamid", "@me");
 		
 		// compose path
-		var path = "/connections/opensocial/basic/rest/activitystreams/" + streamid + "/@all";
+		var path = "/connections/opensocial/basic/rest/activitystreams/" + 
+			streamid + "/@all";
 		
-		// stringify POST data
-		var postData = JSON.stringify(entry);
-		
-		// create options for request and do it
-		var reqOptions = {
-			"host": hostname,
-			"path": path,
-			"method": "POST",
-			"headers": {
-				"Content-Type": "application/json", 
-				"Content-Length": postData.length,
-				"Authorization": that._getCredentials()
-			}
-		}
-		var req = https.request(reqOptions, function(res) {
-			var result = "";
-			res.on("data", function(data) {
-				result += data;
-			});
-			res.on("end", function() {
-				try {
-					var j = JSON.parse(result);
-					callback(j);
-				} catch (e) {
-					process.stdout.write("ERROR <" + e + ">\n");
-				}
-			});
-		});
- 		req.write(postData);
-		req.end();
+		// POST it
+		this._doRequest("POST", path, entry, callback);
 	},
 	this.save = function(id, flag, callback) {
-		// keep ref
-		var that = this;
-		
 		// compose path
 		var path = "/connections/opensocial/basic/rest/activitystreams/@me/@all/@all/" + id;
 		
-		// stringify PUT data
-		var putData = JSON.stringify({"actor": {"id": "@me"},
+		// data to PUT
+		var putData = {"actor": {"id": "@me"},
 			"id": id,
 			"connections": {
 				"saved":  flag
 			}
-		});
+		};
 		
-		// create options for request and do it
+		// PUT it
+		this._doRequest("PUT", path, putData, callback);
+	},
+	this._getOption = function(options, key, defaultValue) {
+		return (options && options[key]) ? options[key] : defaultValue;
+	},
+	this._doRequest = function(method, path, input, callback) {
+		// create options for request
 		var reqOptions = {
 			"host": hostname,
 			"path": path,
-			"method": "PUT",
+			"method": method.toUpperCase(),
 			"headers": {
-				"Content-Type": "application/json", 
-				"Content-Length": putData.length,
-				"Authorization": that._getCredentials()
+				"Authorization": this._getCredentials()
 			}
 		}
+		if (input) {
+			reqOptions.headers["Content-Type"] = "application/json";
+			reqOptions.headers["Content-Length"] = JSON.stringify(input).length;
+		}
+		
+		// do request
 		var req = https.request(reqOptions, function(res) {
 			var result = "";
 			res.on("data", function(data) {
@@ -133,17 +87,14 @@ var AS = function(hostname) {
 			res.on("end", function() {
 				try {
 					var j = JSON.parse(result);
-					callback(j);
+					callback(j, result);
 				} catch (e) {
 					process.stdout.write("ERROR <" + e + ">\n");
 				}
 			});
 		});
- 		req.write(putData);
+		if (input) req.write(JSON.stringify(input));
 		req.end();
-	},
-	this._getOption = function(options, key, defaultValue) {
-		return (options && options[key]) ? options[key] : defaultValue;
 	}
 }
 var Entry = function() {

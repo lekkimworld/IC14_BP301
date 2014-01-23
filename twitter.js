@@ -143,6 +143,26 @@ var Status = function(obj) {
 			return this.getMentions().length != 0;
 		}
 	}
+	this.getHashtags = function() {
+		var hashtags = this.obj.entities.hashtags;
+		var result = [];
+		for (var k=0; k<hashtags.length; k++) {
+			var hashtag = hashtags[k].text;
+			result.push(hashtag);
+		}
+		return result;
+	}
+	this.hasHashtag = function(hashtag) {
+		if (arguments && arguments.length == 1) {
+			var hashtags = this.getHashtags();
+			for (var i=0; i<hashtags.length; i++) {
+				if (hashtags[i].toLowerCase() == hashtag.toLowerCase()) return true;
+			}
+			return false;
+		} else {
+			return this.getHashtags().length != 0;
+		}
+	}
 }
 
 // export
