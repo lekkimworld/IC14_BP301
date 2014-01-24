@@ -89,10 +89,11 @@ var search = function(query, callback) {
 				var j = JSON.parse(result);
 				
 				// store since
-				if (j.search_metadata.since_id) {
+				process.stdout.write(JSON.stringify(j.search_metadata) + "\n");
+				if (j.search_metadata.max_id_str) {
+					SINCE_ID = j.search_metadata.max_id_str;
+				} else if (j.search_metadata.since_id) {
 					SINCE_ID = j.search_metadata.since_id;
-				} else {
-					SINCE_ID = j.search_metadata.max_id + 1;
 				}
 				
 				// callback
