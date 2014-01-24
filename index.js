@@ -21,6 +21,7 @@ var doSearch = function() {
 	var as = new cnx.AS("connections.connect2014.com");
 	
 	// do twitter search
+	process.stdout.write("------------------------------------------------\n");
 	twitter.search("#ibmconnect", function(result) {
 		process.stdout.write("\tTwitter search resulted in <" + result.statuses.length + "> result(s).\n");
 		
@@ -29,7 +30,8 @@ var doSearch = function() {
 			if (status.hasMention(LOOKFOR_USERNAME)) return true;
 			if (status.hasMention("ontimesuite")) return true;
 			if (status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
-			if (status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
+			if (status.getSender() != LOOKFOR_USERNAME && 
+				status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
 			return false;
 		}
 		// function to determine include
