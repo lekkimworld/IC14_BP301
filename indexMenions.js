@@ -17,9 +17,12 @@ var as = new cnx.AS("connections.connect2014.com");
 // callback for search
 var callback = function(data) {
 	if (!data || data.totalResults <= 0) {
-		process.stdout.write("Bummer - no one is mentioning you...\n");
+		process.stdout.write("Bummer - no one is mentioning you - go home and cry...\n");
 	} else {
 		process.stdout.write("Important aren't you - found <" + result.totalResults + "> mentions...\n");
+		for (var i=0; i<data.list.length; i++) {
+			process.stdout.write("\t" + data.list[i].content + "\n");
+		}
 	}
 	
 	// reschedule
