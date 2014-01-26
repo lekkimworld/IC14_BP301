@@ -16,12 +16,16 @@ var as = new cnx.AS("connections.connect2014.com");
 
 // callback for search
 var callback = function(data) {
-	if (!data || data.totalResults <= 0) {
+	if (!data || !data.list || data.list.length <= 0) {
 		process.stdout.write("Bummer - no one is mentioning you - go home and cry...\n");
 	} else {
-		process.stdout.write("Important aren't you - found <" + result.totalResults + "> mentions...\n");
-		for (var i=0; i<data.list.length; i++) {
-			process.stdout.write("\t" + data.list[i].content + "\n");
+		var count = data.list.length;
+		if (count == 1) {
+			process.stdout.write("How sad - only 1 mention - did you mention yourself?\n");
+		} else if (count < 5) {
+			process.stdout.write("Important aren't you - found <" + data.totalResults + "> mentions...\n");
+		} else {
+			process.stdout.write("Quite the talk of the town ha'!! <" + data.totalResults + "> mentions...\n");
 		}
 	}
 	
