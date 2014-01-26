@@ -64,7 +64,7 @@ var search = function(query, callback) {
 	} else {
 		// do search - compose arguments
 		process.stdout.write("Searching for <" + query + "> since <" + SINCE_ID + ">\n");
-		var urlArgs = "q=" + encodeURIComponent(query) + "&count=100";
+		var urlArgs = "q=" + encodeURIComponent(query) + "&count=200";
 		if (SINCE_ID) urlArgs += "&since_id=" + SINCE_ID;
 		
 		// compose options

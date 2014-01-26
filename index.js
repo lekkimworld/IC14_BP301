@@ -29,7 +29,8 @@ var doSearch = function() {
 		var saveStatus = function(status) {
 			if (status.hasMention(LOOKFOR_USERNAME)) return true;
 			if (status.hasMention("ontimesuite")) return true;
-			if (status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
+			if (status.getSender() != LOOKFOR_USERNAME && 
+				status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
 			if (status.getSender() != LOOKFOR_USERNAME && 
 				status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
 			return false;
@@ -50,7 +51,7 @@ var doSearch = function() {
 				
 				// compose strings
 				var objectId = status.getID();
-				var displayName = "Tweet mentioning himself...";
+				var displayName = "Tweet mentioning himself (or his session(s)...";
 				var content = "Tweet from " + status.getSender() + ": " + status.getText();
 				var url = status.getURL();
 				var summary = "<table border=\"0\"><tr><td width=\"65\" valign=\"top\">";
@@ -81,7 +82,7 @@ var doSearch = function() {
 					.finalize();
 					
 				// post it
-				as.post(entry, {"streamid": "@me"}, function(result) {
+				as.post(entry, {"streamid": "@public"}, function(result) {
 					process.stdout.write("\tPosted to activity stream.\n");
 					
 					// see if we should save it

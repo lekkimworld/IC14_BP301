@@ -89,7 +89,8 @@ var AS = function(hostname) {
 					var j = JSON.parse(result);
 					callback(j, result);
 				} catch (e) {
-					process.stdout.write("ERROR <" + e + ">\n");
+					process.stderr.write("ERROR <" + e + ">\n");
+					process.stderr.write("\t" + result + "\n");
 				}
 			});
 		});
