@@ -1,0 +1,16 @@
+http://showtime.ontimesuite.com/connections/opensocial/basic/rest/activitystreams/@me/@all
+http://showtime.ontimesuite.com/connections/opensocial/basic/rest/activitystreams/urn:lsid:lconn.ibm.com:communities.community:1c6fcd32-3543-48e0-93f4-8fdc15779a99/@all
+
+http://connections.connect2014.com/connections/opensocial/basic/rest/activitystreams/@me/@all
+{"actor": {"id": "@me"},
+	"verb": "post",
+	"title": "Mat, Mat, Mat... OMG!!",
+	"updated": "2014-01-27T18:00:00.000Z",
+	"object": {
+		"title": "Mat, Mat, Mat... OMG!!",
+		"objectType": "blogentry",
+		"id": "1234567890-1234567890-1234567890",
+		"url": "https://www.dropbox.com/s/zhevglryl90qkwq/Photo%2020-08-13%2000.18.26.jpg"
+	}
+}
+

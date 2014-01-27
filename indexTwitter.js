@@ -89,6 +89,7 @@ var doSearch = function() {
 					if (result && saveStatus(status)) {
 						process.stdout.write("Activity Stream entry should be saved.\n");
 						var entryId = result.entry.id;
+						process.stdout.write("\tEntry id <" + entryId + ">\n");
 						as.save(entryId, true, function(result) {
 							process.stdout.write("\tSaved activity stream entry.\n");
 						});
