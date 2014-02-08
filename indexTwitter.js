@@ -29,10 +29,8 @@ var doSearch = function() {
 		var saveStatus = function(status) {
 			if (status.hasMention(LOOKFOR_USERNAME)) return true;
 			if (status.hasMention("ontimesuite")) return true;
-			if (status.getSender() != LOOKFOR_USERNAME && 
-				status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
-			if (status.getSender() != LOOKFOR_USERNAME && 
-				status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
+			if (status.getText().toLowerCase().indexOf("bp301") >= 0) return true;
+			if (status.getText().toLowerCase().indexOf("bp309") >= 0) return true;
 			return false;
 		}
 		// function to determine include
@@ -86,7 +84,7 @@ var doSearch = function() {
 					process.stdout.write("\tPosted to activity stream.\n");
 					
 					// see if we should save it
-					if (result && saveStatus(status)) {
+					if (saveStatus(status)) {
 						process.stdout.write("Activity Stream entry should be saved.\n");
 						var entryId = result.entry.id;
 						process.stdout.write("\tEntry id <" + entryId + ">\n");
